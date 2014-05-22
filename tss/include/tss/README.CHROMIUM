@@ -1,0 +1,9 @@
+This directory contains the headers specified by the TCG Software Stack (TSS)
+Specification Version 1.2 Errata A, available at:
+http://www.trustedcomputinggroup.org/resources/tcg_software_stack_tss_specification
+
+These are redistributed under different licensing terms than Chromium OS. Please
+see the TCG licensing terms for details, which are available at:
+http://www.trustedcomputinggroup.org/legal_notices
+
+See TSS_CHANGELOG for the changelog for these headers.

@@ -1,0 +1,294 @@
+-------------------------------------------------------------------
+Wed Jun 13 2007
+
+tss12 include final no wsdl
+
+* Removed TSS-WSDL.txt
+
+-------------------------------------------------------------------
+Wed Jun 6 2007
+
+tss12 include final
+
+* in tpm.h, added TPM_CAP_DA_LOGIC definition
+
+* in tss_defines.h added TSS_TPMCAP_DA_LOGIC as a new capability area.
+The subCap should be one of the TPM_ET_* entity types.
+
+-------------------------------------------------------------------
+Wed May 30 2007
+
+tss12 include GC Errata 11
+
+* In tcs.h, include tcs_defines.h
+
+* In tcs_defines.h, changed TCS_TCSATTRIB_* to TSS_TCSATTRIB_*
+
+* In tss_defines.h, added TSS_TPMCAP_PROP_MIN_COUNTER as 0x27
+
+* Removed two temp files hanging around in the archive
+
+-------------------------------------------------------------------
+Tue Mar 27 2007
+
+tss12 include GC Errata 11
+
+* In tspi.h, added Tspi_TPM_OwnerGetSRKPubKey.
+
+* In tspi.h, fixed type of "daaPubKey" parameter in DAA callback
+typedefs, removed #ifdefs that disabled those definitions.
+
+-------------------------------------------------------------------
+Wed Jan 10 2007
+
+tss12 include GC Errata 10
+
+* In tspi.h, fix several structs which had commas after their final
+parameters.  Changed Tspi_DAA_IssueGenerateKey to
+Tspi_DAA_Issuer_GenerateKey to match the spec.  Added a missing
+comma in one struct definition. Commented out the DAA callback
+definitions until a final function prototype is agreed upon.
+
+* In tss_structs.h, moved the definition of TSS_DAA_ATTRIB_COMMIT
+higher in the file, to allow other structures that reference it
+to compile.  Fixed a type-o, changing TSS_DAA_ATTRIB_CCOMMIT to
+TSS_DAA_ATTRIB_COMMIT.
+
+-------------------------------------------------------------------
+tss12 include GC Errata 9
+-------------------------------------------------------------------
+Thu Oct 12 2006
+
+tss12 include GC Errata 8
+
+* In compat11b.h, #define of TCPA_ET_OWNER from TPM_ET_KEY to TPM_ET_OWNER.
+
+* In tpm.h, changed TPM_SET_PERMFLAGS to TPM_SET_PERM_FLAGS to match TPM spec.
+
+* In tcs.h, added Tcsip_OwnerReadInternalPub and Tcsip_FlushSpecific.
+
+* In tss_defines.h, tss_structs.h, and tss_typedef.h, changed DAA
+definitions to match new spec 
+Published Level 1 with Errata A Golden Candidate 2-KEY-061027.pdf
+
+-------------------------------------------------------------------
+Thu Oct 12 2006
+
+tss12 include GC Errata 8
+
+* in tspi.h, altered DAA APIs to match TSS 1.2 Errata A Golden
+Candidate 3.
+
+* in tss_defines.h, added the TSS_OBJECT_TYPE_DAA_DATA object type
+flag. Also added TSS_TSPATTRIB_DAA_DATA flag and subFlags for each
+DAADATA data type.
+
+* in tss_typedef.h, added TSS_HDAA_DATA object handle definition.
+
+* in tss_structs.h, added TSS_HDAA_DATA handles in the
+TSS_DAA_JOIN_SESSION and TSS_DAA_JOIN_ISSUER_SESSION structures.
+
+-------------------------------------------------------------------
+Wed Sep  6 2006
+
+tss12 include GC Errata 7
+
+* In compat11b.h, changed #defines <TCPA_TYPE> <TPM_TYPE> into
+typedef <TPM_TYPE> <TCPA_TYPE>
+
+* In tcs.h, changed name of length field from ulCurrentTicks to
+ulCurrentTicksSize in Tcsip_EstablishTransport. In
+Tcsip_ReleaseTransportSigned changed name of length field from
+pulCurrentTicks to pulCurrentTicksSize.
+
+* In tcs.h, added Tcsip_ResetLockValue.
+
+* In tcs.h, added Tcsi_GetCredential.
+
+* In tcs_defines.h, added macros to support Tcsi_GetCredential.
+
+* In tcs_structs.h, changed name of structure from TPM_AUTH to
+TCS_AUTH, since it is used only in the TCS API. Added typedef for
+TPM_AUTH for backward compatibility.
+
+* In tcs_typedef.h, added #include <tpm.h> because some of the typedefs
+in this file require definitions from tpm.h.
+
+* In tpm.h, moved definition of TPM_SYM_MODE to the end of the file,
+and added definitions for its valid values.
+
+* In tpm_ordinal.h, added TPM_ORD_ResetLockValue.
+
+* In tspi.h, added #includes so header is self-contained.
+
+* In tspi.h, removed Tspi_TPM_SetOrdinalAuditStatus. This is now
+controlled via attributes of the TPM object.
+
+* In tspi.h, added missing nonces to Tspicb_CallbackSealxMask.
+
+* In tspi.h, minor reformatting by changing whitespace.
+
+* In tss_defines.h, added TSS_KEY_TYPE_MIGRATE.
+
+* In tss_defines.h, added TSS_TSPATTRIB_TPM_ORDINAL_AUDIT_STATUS.
+
+* In tss_defines.h, added attribute flags for setting certificate
+blobs via Tspi_SetAttribData.
+
+* In  tss_defines.h, added policy attribute for Sealx callback.
+
+* In tss_defines.h, added TSS_ALG_DEFAULT and TSS_ALG_DEFAULT_SIZE
+for use with Tspi_Context_GetCapability.
+
+* In tss_defines.h, added TPM status flag for ResetLock.
+
+* In tss_defines.h, removed deleted TPM capability flags:
+TSS_TPMCAP_PROP_MINCOUNTERSIZE, TSS_TPMCAP_PROP_ORD_AUDITED,
+and TSS_TPMCAP_PROP_ORD_FAMILY_TABLE.
+
+* In tss_defines.h, added TSS_RT_* values, for use with
+Tspi_TPM_GetCapability(TSS_TPMCAP_HANDLE).
+
+* In tss_defines.h, added missing TCS subcap flags:
+TSS_TCSCAP_PLATFORM_INFO, TSS_TCSCAP_PROP_HOST_PLATFORM,
+and TSS_TCSCAP_PROP_ALL_PLATFORMS.
+
+* In tss_defines.h, added flags for TSP returnvalue capabilities:
+TSS_TSPCAP_RETURNVALUE_INFO and TSS_TSPCAP_PROP_RETURNVALUE_INFO.
+
+* In tss_error.h, added TSS_E_NO_ACTIVE_COUNTER and
+TSS_E_TSP_TRANS_NO_PUBKEY.
+
+* In tss_structs.h, minor reformatting with whitespace.
+
+* In tss_structs.h, added TSS_DAA_KEY_PAIR,
+TSS_DAA_ATTRIB_COMMIT_PARAM, and TSS_PLATFORM_CLASS.
+
+-------------------------------------------------------------------
+Wed Mar 15 2006
+
+tss12 include GC Errata 6
+
+* In tss_structs.h, remove "selector" field from TSS_DAA_SIGN_DATA
+
+* In tss_defines.h, add macros for TSS_FLAG_DAA_SIGN_IDENTITY_KEY,
+TSS_FLAG_DAA_SIGN_MESSAGE_HASH, TSS_FLAG_DAA_PSEUDONYM_PLAIN,
+and TSS_FLAG_DAA_PSEUDONYM_ENCRYPTED.
+
+-------------------------------------------------------------------
+Mon Feb 13 2006
+
+tss12 include GC Errata 5
+
+* In tss_structs.h, removed #ifndef __midl around "#include tpm.h".
+That is, make the tpm definitions available when midl is active.
+
+* In tss_structs.h, Changed fields in TSS_VALIDATION structure
+to match written spec.
+
+* In tss_defines.h, #include tpm.h because the DAA definitions depend
+on the constants defined in that file
+
+* In tpm.h, disabled definition of TPM_NV_DATA_SENSITIVE.
+
+* In tddli.h, added power management functions, applying comments
+from LinYang@lenovo.com
+
+-------------------------------------------------------------------
+Thu Feb 09 2006
+
+* Changed tss_structs.h according to email #37371
+  -removed macro TSS_DAA_SIZE
+  -added length to specify second dimension of 2-dim arrays of DAA structures
+
+* Changed tss_defines.h accroding to email #37366
+  -added constants for DAA
+
+* Changed compat11b.h according to email #37225
+  -added
+  #define TCPA_SYM_CA_ATTESTATION TPM_SYM_CA_ATTESTATION
+  #define TCPA_ASYM_CA_CONTENTS   TPM_ASYM_CA_CONTENTS
+  #define TCPA_IDENTITY_REQ       TPM_IDENTITY_REQ
+  #define TCPA_IDENTITY_PROOF     TPM_IDENTITY_PROOF
+
+
+-------------------------------------------------------------------
+Wed Dec 14 2005
+
+tss12 include GC Errata 3
+
+* Added buffer for public key to Tcsip_KeyControlOwner. 
+Based on discussion in WG on Dec 14. See also email #36406.
+
+* Added baseNameLength and baseName to Tspi_DAA_VerifyInit.
+See email #36432.
+
+* Changed nonceVerifierLength, nonceVerifier, baseNameLength,
+and baseName parameters from 'out' to 'in' in Tspi_DAA_VerifySignature.
+Also removed one level of indirection from those parameters.
+See email #36432.
+
+* Added daaCounter field to TSS_DAA_JOIN_SESSION.
+See email #36432.
+
+* Changed definitions of TSS_CMK_DELEGATE_* values in tss_defines.h
+so that they do not depend on the TPM_CMK_DELEGATE_* macros. This
+reduces header file dependencies.
+
+-------------------------------------------------------------------
+Tue Dec 13 2005
+
+tss12 include GC Errata 2
+
+* Changed Tspi_TPM_GetAuditDigest to output the audit digest as a
+UINT32*/BYTE** instead of a TPM_DIGEST*. See email #36029 and 36077.
+
+* Added TSS_TPMCAP_SET_PERM_FLAGS and TSS_TPMCAP_SET_VENDOR.
+See email #36077.
+
+* Added midl definitions for multi-dimensional DAA structures.
+See emails #36029 and 36042. During the WG call on Nov 
+30 it was agreed to not add new fields, but have the array
+lengths be constants dictated by the VersionInfo field.
+
+* Added TSS_CMK_DELEGATE_* macros. See email #36042.
+
+
+-------------------------------------------------------------------
+Wed Nov 16 2005 
+
+tss12 include GC Errata 1
+
+Applied changes proposed by Infineon in emails archived as #35490,
+35507, 35541, 35584, 35964:
+* Hid definition of UINT16 on Windows to allow to compile on Win32
+  systems.
+* Added bitmask definitions to extract key initflags fields.
+* Added #defines for TSS_KEYUSAGE_AUTHCHANGE, TSS_KEYUSAGE_MIGRATE,
+  TSS_KEYFLAG_CERTIFIED_MIGRATABLE, TSS_ALG_MGF1,
+  TSS_MS_RESTRICT_APPROVE_DOUBLE, TSS_MS_RESTRICT_MIGRATE_EXTERNAL.
+* Eliminated hole in enum values for TSS_KEYUSAGE.
+* Added #defines for ASN.1 version and blob types.
+* Added missing midl size_is declarations identified by Infineon.
+
+Additions/Corrections/Changes beyond those emails
+* Added TSP.idl posted by Infineon.
+* Added TSS-WSDL.txt file posted by IBM.
+* Certain TSS_TPMCAP values were not defined based on
+  working-group email exchange from Dave Challener.
+* Instead of accepting the RSA_*_BITMASK proposed by Infineon
+  for the key initflags masks, the masks were named TSS_*_BITMASK
+  so that the mask name corresponds to the bitfield names.
+  RSAKEY_USAGE_BITMASK    --> TSS_KEY_TYPE_BITMASK
+  RSAKEY_SIZE_BITMASK     --> TSS_KEY_SIZE_BITMASK
+  RSAKEY_TEMPLATE_BITMASK --> TSS_KEY_TEMPLATE_BITMASK
+* TSS_TPMCAP_SET_PERM_FLAGS/TSS_TPMCAP_PF_READSRKPUB were not added
+  This functionality is already provided by 
+  Tspi_TPM_SetStatus(TSS_TPMSTATUS_DISABLEPUBSRKREAD)
+* MIDL size_is definitions were added for DAA structures in
+  tss_structs.h. These are incomplete.
+* In tpm.h, TPM_PERMANENT_FLAGS.operator was renamed
+  TPM_PERMANENT_FLAGS.Operator because 'operator' is a
+  reserved word in C++.
+
+

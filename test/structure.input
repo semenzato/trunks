@@ -1,0 +1,22 @@
+/* This reinforces the case that the parser can cope with comments. */
+
+// Ditto.
+
+typedef UINT32 foo
+typedef UINT16 TPM_TAG
+typedef UINT16 TPM_COMMAND_CODE
+
+typedef struct tdBAR
+{
+  foo x;
+  foo y;
+  foo z;
+} BAR;
+
+typedef struct tdFOOBAR
+{
+  foo n;
+  SIZEIS(n)
+    BYTE *key
+} FOOBAR;
+

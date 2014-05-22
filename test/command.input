@@ -1,0 +1,9 @@
+_TPM_COMMAND TPM_VerySimple
+_COMMENT TPM_VerySimple is the simplest kind.  There can be nothing simpler.
+_IN_PARAM TPM_TAG tag TPM_TAG_RQU_COMMAND
+_IN_PARAM UINT32 paramSize Total number of input bytes including paramSize and tag
+_IN_PARAM TPM_COMMAND_CODE ordinal Command ordinal: TPM_ORD_VerySimple
+_OUT_PARAM TPM_TAG tag TPM_TAG_RSP_COMMAND
+_OUT_PARAM UINT32 paramSize Total number of output bytes including paramSize and tag
+_OUT_PARAM TPM_RESULT returnCode The return code of the operation.
+

@@ -1,0 +1,786 @@
+/*++
+
++++TCS.idl
+
+Interface declarations for the TSS Core Service - COM interface for Windows based platforms 
+    
+--*/
+/*
+Missing:
+TCS_OpenContext
+TCPA_RESULT TCS_CloseContext
+TCPA_RESULT TCS_FreeMemory
+*/
+
+
+import "oaidl.idl";
+import "ocidl.idl";
+// header file for the basic tcpa data types
+import "tcs_structs.h";
+
+[
+    object,
+    uuid(FBCD9C02-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSBase Interface"),
+    pointer_default(unique)
+]
+interface ITCSBase : IUnknown
+{
+    [helpstring("method TCSP_GetRandom")] 
+    HRESULT TCSP_GetRandom(	[in, out] UINT32* bytesRequested,
+                            [out, size_is(,*bytesRequested)] BYTE** randomBytes);	
+
+    [helpstring("method TCSP_StirRandom")] 
+    HRESULT TCSP_StirRandom([in] UINT32 PunInDataSize,
+                            [in, size_is(PunInDataSize)] BYTE* PrgbInData);
+
+    [helpstring("method TCS_GetCapability")] 
+    HRESULT TCS_GetCapability(	[in] TPM_CAPABILITY_AREA capArea,
+                                [in] UINT32 subCapSize,
+                                [in, ptr, size_is(subCapSize)] BYTE* subCap,
+                                [out] UINT32* respSize,
+                                [out, size_is(, *respSize)] BYTE** resp);
+};
+
+[
+    object,
+    uuid(FBCD9C03-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSKey Interface"),
+    pointer_default(unique)
+]
+interface ITCSKey1 : IUnknown
+{
+    [helpstring("method TCSP_LoadKeyByBlob")] 
+    HRESULT TCSP_LoadKeyByBlob(		[in] TCS_KEY_HANDLE	hUnwrappingKey,
+                            [in] UINT32		cWrappedKeyBlobSize,
+                            [in, size_is(cWrappedKeyBlobSize)] BYTE* rgbWrappedKeyBlob,
+                            [in, out, ptr] TPM_AUTH*	pAuth,
+                            [out] TCS_KEY_HANDLE*	phKeyTCSI,
+                            [out] TCS_KEY_HANDLE*	phKeyHMAC);
+
+    [helpstring("method TCSP_CreateWrapKey")] 
+    HRESULT TCSP_CreateWrapKey(		[in] TCS_KEY_HANDLE hWrappingKey,		
+                            [in] TCG_ENCAUTH KeyUsageAuth,
+                            [in] TCG_ENCAUTH KeyMigrationAuth,
+                            [in, out] UINT32* pcKeySize,
+                            [in, out, size_is(, *pcKeySize)] BYTE** prgbKey,
+                            [in, out, ptr] TPM_AUTH* pAuth);
+
+    [helpstring("method TCSP_GetPubKey")] 
+    HRESULT TCSP_GetPubKey(	[in] TCS_KEY_HANDLE hKey,
+                            [in, out, ptr] TPM_AUTH* pAuth,
+                            [out] UINT32* pcPubKeySize,
+                            [out, size_is(, *pcPubKeySize)] BYTE** prgbPubKey);	
+                             
+    [helpstring("method TCSP_EvictKey")] 
+    HRESULT TCSP_EvictKey([in] TCS_KEY_HANDLE hKey);
+};
+
+[
+    object,
+    uuid(FBCD9C0D-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSKey Interface"),
+    pointer_default(unique)
+]
+interface ITCSKey : ITCSKey1  
+{
+    [helpstring("method TCSP_CertifyKey")]
+    HRESULT TCSP_CertifyKey([in] TCS_KEY_HANDLE	hCertHandle,
+                            [in] TCS_KEY_HANDLE	hKeyHandle,
+                            [in] TCG_NONCE	AntiReplay,
+                            [in, out, ptr] TCS_AUTH*	pCertAuth,
+                            [in, out, ptr] TCS_AUTH*	pKeyAuth,
+                            [out] UINT32* pcCertifyInfoSize,
+                            [out, size_is(, *pcCertifyInfoSize)] BYTE** ppCertifyInfo,
+                            [out] UINT32* pcOutDataSize,
+                            [out, size_is(, *pcOutDataSize)] BYTE** ppOutData);
+};
+
+[
+    object,
+    uuid(FBCD9C11-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSKey2 Interface"),
+    pointer_default(unique)
+]
+interface ITCSKey2 : ITCSKey  
+{
+    [helpstring("method TCSP_LoadKey2ByBlob")] 
+    HRESULT TCSP_LoadKey2ByBlob([in] TPM_KEY_HANDLE		hUnwrappingKey,
+                                [in] UINT32				cWrappedKeyBlobSize,
+                                [in, size_is(cWrappedKeyBlobSize)] BYTE* rgbWrappedKeyBlob,
+                                [in, out, ptr] TPM_AUTH*	pAuth,
+                                [out] TPM_KEY_HANDLE*		phKeyTCSI);
+
+    [helpstring("method TCSP_MigrateKey")]
+    HRESULT TCSP_MigrateKey([in] TPM_KEY_HANDLE	hMaKeyHandle,
+                            [in] UINT32		cPubKeyDataSize,
+                            [in, size_is(cPubKeyDataSize)] BYTE* pPubKeyData,
+                            [in] UINT32		cInDataSize,
+                            [in, size_is(cInDataSize)] BYTE* pInData,
+                            [in, out, ptr] TPM_AUTH*	pKeyAuth,
+                            [out] UINT32*		pcOutDataSize,
+                            [out, size_is(, *pcOutDataSize)] BYTE** ppOutData);
+
+};	// end of interface ITCSKeyInterim1
+[
+    object,
+    uuid(FBCD9C14-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSNonVolatileStorage Interface"),
+    pointer_default(unique)
+]
+interface ITCSNonVolatileStorage : IUnknown
+{
+    [helpstring("method TCSP_DefineOrReleaseSpace")]	
+    HRESULT TCSP_DefineOrReleaseSpace([in] UINT32 cPubInfoSize,
+                            [in, size_is(cPubInfoSize)] BYTE*	pPubInfo,
+                            [in] TPM_ENCAUTH EncAuth,
+                            [in, out, ptr] TPM_AUTH*	pOwnerAuth);
+
+    [helpstring("method TCSP_ReadValue")]
+    HRESULT TCSP_ReadValue( [in] TPM_NV_INDEX	NVStore,
+                            [in] UINT32	Offset,
+                            [in,out] UINT32*	pcDataSize,
+                            [in, out, ptr] TPM_AUTH*	pOwnerAuth,
+                            [out, size_is(,*pcDataSize)] BYTE**	ppData);
+
+    [helpstring("method TCSP_ReadValueAuth")]
+    HRESULT TCSP_ReadValueAuth( [in] TPM_NV_INDEX	NVStore,
+                                [in] UINT32	Offset,
+                                [in,out] UINT32*	pcDataSize,
+                                [in, out, ptr] TPM_AUTH*	pNVAuth,
+                                [out, size_is(,*pcDataSize)] BYTE**	ppData);
+
+    [helpstring("method TCSP_WriteValue")]
+    HRESULT TCSP_WriteValue([in] TPM_NV_INDEX	NVStore,
+                            [in] UINT32	Offset,
+                            [in] UINT32	cDataSize,
+                            [in, size_is(cDataSize)] BYTE*	pData,
+                            [in, out, ptr] TPM_AUTH*	pOwnerAuth);
+
+    [helpstring("method TCSP_WriteValueAuth")]
+    HRESULT TCSP_WriteValueAuth([in] TPM_NV_INDEX	NVStore,
+                            [in] UINT32	Offset,
+                            [in] UINT32	cDataSize,
+                            [in, size_is(cDataSize)] BYTE*	pData,
+                            [in, out, ptr] TPM_AUTH*	pNVAuth);
+
+};	// end of interface ITCSNonVolatileStorage
+
+[
+    object,
+    uuid(FBCD9C15-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSTransportProtection Interface"),
+    pointer_default(unique)
+]
+interface ITCSTransportProtection : IUnknown
+{
+    [helpstring("method TCSP_EstablishTransport")]	
+    HRESULT TCSP_EstablishTransport([in] UINT32	 TransControlFlags,
+                            [in] TPM_KEY_HANDLE	hEncKey,
+                            [in] UINT32	cTransSessionInfoSize,
+                            [in, size_is(cTransSessionInfoSize)] BYTE*	pTransSessionInfo,
+                            [in] UINT32	cSecretSize,
+                            [in, size_is(cSecretSize)] BYTE* pSecret,	
+                            [in, out, ptr] TPM_AUTH*	pEncKeyAuth,	
+                            [out] TPM_MODIFIER_INDICATOR*	pbLocality,
+                            [out] TCS_HANDLE* phTransSession,
+                            [out] UINT32*	pcCurrentTicks,
+                            [out, size_is(, *pcCurrentTicks)] BYTE** ppCurrentTicks,
+                            [out] TPM_NONCE* pTransNonce);
+
+    [helpstring("method TCSP_ExecuteTransport")]
+    HRESULT TCSP_ExecuteTransport([in] TPM_COMMAND_CODE	unWrappedCommandOrdinal,	
+                            [in] UINT32	cWrappedCmdDataInSize,
+                            [in, size_is(cWrappedCmdDataInSize)] BYTE* 	pWrappedCmdDataIn,	
+                            [in, out] UINT32* pcHandleListSize,
+                            [in, out, size_is(, *pcHandleListSize)] TPM_HANDLE** pphHandles,
+                            [in, out, ptr] TPM_AUTH* pWrappedCmdAuth1,	
+                            [in, out, ptr] TPM_AUTH* pWrappedCmdAuth2,	
+                            [in, out, ptr] TPM_AUTH* pTransAuth,
+                            [out] UINT64* pCurrentTicks,
+                            [out] TPM_MODIFIER_INDICATOR* pbLocality,
+                            [out] TPM_RESULT*	pWrappedCmdReturnCode,
+                            [out] UINT32* pcWrappedCmdDataOutSize,
+                            [out, size_is(, *pcWrappedCmdDataOutSize)] BYTE** 	ppWrappedCmdParamOut);
+
+    [helpstring("method TCSP_ReleaseTransportSigned")]
+    HRESULT TCSP_ReleaseTransportSigned([in] TPM_KEY_HANDLE hSignatureKey,
+                            [in] TPM_NONCE	AntiReplayNonce,
+                            [in, out, ptr] TPM_AUTH*	pKeyAuth,
+                            [in, out, ptr] TPM_AUTH*	pTransAuth,
+                            [out] TPM_MODIFIER_INDICATOR* pbLocality,
+                            [out] UINT32*	pcCurrentTicksSize,
+                            [out, size_is(, *pcCurrentTicksSize)] BYTE**	ppCurrentTicks,
+                            [out] UINT32*	pcSignatureSize,
+                            [out, size_is(, *pcSignatureSize)] BYTE**	ppSignature);
+
+};	// end of interface ITCSTransportProtection
+
+[
+    object,
+    uuid(FBCD9C16-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSCertifiedMigration Interface"),
+    pointer_default(unique)
+]
+interface ITCSCertifiedMigration : IUnknown
+{
+    [helpstring("method TCSP_CMK_SetRestrictions")]
+    HRESULT TCSP_SetRestrictions([in] TPM_CMK_DELEGATE		Restriction,
+                            [in, out, ptr] TPM_AUTH*	pOwnerAuth);
+
+    [helpstring("method TCSP_CMK_ApproveMA")]
+    HRESULT TCSP_ApproveMA([in] TPM_DIGEST MigAuthorityDigest,
+                            [in, out, ptr] TPM_AUTH*	pOwnerAuth,
+                            [out] TPM_HMAC* pHmacMigAuthDigest);
+
+    [helpstring("method TCSP_CMK_CreateKey")]
+    HRESULT TCSP_CreateKey([in] TPM_KEY_HANDLE	hMaKeyHandle,
+                            [in] TPM_ENCAUTH KeyUsageAuth,
+                            [in] TPM_HMAC	MigAuthApproval,
+                            [in] TPM_DIGEST MigAuthorityDigest,
+                            [in, out] UINT32* pckeyDataSize,
+                            [in, out, size_is(, *pckeyDataSize)] BYTE** ppKeyData,
+                            [in, out, ptr] TPM_AUTH*	pOwnerAuth);
+
+    [helpstring("method TCSP_CMK_CreateTicket")]	
+    HRESULT TCSP_CreateTicket([in] UINT32	cPublicVerifyKeySize,
+                            [in, size_is(cPublicVerifyKeySize)] BYTE*	pPublicVerifyKey,
+                            [in] TPM_DIGEST	SignedData,
+                            [in] UINT32	cSigValueSize,
+                            [in, size_is(cSigValueSize)] BYTE*	SigValue,
+                            [in, out, ptr] TPM_AUTH*	pOwnertAuth,
+                            [out] TPM_HMAC*	pSigTicket);
+
+    [helpstring("method TCSP_CMK_CreateBlob")]
+    HRESULT TCSP_CreateBlob([in] TPM_KEY_HANDLE hParentHandle,
+                            [in] TPM_MIGRATE_SCHEME	MigrationType,
+                            [in] UINT32	cMigrationKeyAuthSize,
+                            [in, size_is(cMigrationKeyAuthSize)] BYTE*	pMigrationKeyAuth,
+                            [in] TPM_DIGEST	PubSourecKeyDigest,
+                            [in] UINT32	cMsaListSize,
+                            [in, size_is(cMsaListSize)]	BYTE* pMsaList,
+                            [in] UINT32	cRestrictTicketSize,
+                            [in, size_is(cRestrictTicketSize)]	BYTE* pRestrictTicket,
+                            [in] UINT32	cSigTicketSize,
+                            [in, size_is(cSigTicketSize)]	BYTE* pSigTicket,
+                            [in] UINT32	cEncDataSize,
+                            [in, size_is(cEncDataSize)]	BYTE* pEncData,
+                            [in, out] TPM_AUTH*	pParentAuth,
+                            [out] UINT32*	pcRandomSize,
+                            [out, size_is(, *pcRandomSize)] BYTE**	ppRandom,
+                            [out] UINT32*	pcOutDataSize,
+                            [out, size_is(, *pcOutDataSize)] BYTE**	ppOutData);
+
+    [helpstring("method TCSP_CMK_ConvertMigration")]
+    HRESULT TCSP_ConvertMigration([in] TPM_KEY_HANDLE hParentHandle,
+                            [in] TPM_CMK_AUTH	RestrictTicket,
+                            [in] TPM_HMAC	SigTicket,
+                            [in] UINT32	cKeyDataSize,
+                            [in, size_is(cKeyDataSize)] BYTE* pKeyData,
+                            [in] UINT32	cMsaListSize,
+                            [in, size_is(cMsaListSize)]	BYTE* pMsaList,
+                            [in] UINT32	cRandomSize,
+                            [in, size_is(cRandomSize)] BYTE*	pRandom,
+                            [in, out, ptr] TPM_AUTH*	pParentAuth,
+                            [out] UINT32*	pcOutDataSize,
+                            [out, size_is(, *pcOutDataSize)] BYTE**	ppOutData);
+}// end of interface ITCSCertifiedMirgation
+
+[
+    object,
+    uuid(FBCD9C04-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSKeyManage Interface"),
+    pointer_default(unique)
+]
+interface ITCSKeyManage : IUnknown
+{
+    [helpstring("method TCSP_LoadKeyByUUID")] 
+    HRESULT TCSP_LoadKeyByUUID(	[in] TSS_UUID KeyUUID,
+                                [in, out, ptr] TCS_LOADKEY_INFO* pLoadKeyInfo,
+                                [out] TCS_KEY_HANDLE* phKeyTCSI);
+
+    [helpstring("method TCS_RegisterKey")] 
+    HRESULT TCS_RegisterKey([in] TSS_UUID WrappingKeyUUID,
+                            [in] TSS_UUID KeyUUID,
+                            [in] UINT32 cKeySize,
+                            [in, size_is(cKeySize)] BYTE* rgbKey,				
+                            [in, defaultvalue(0)] UINT32 cVendorData,
+                            [in, ptr, size_is(cVendorData), defaultvalue(0)] BYTE* rgbVendorData);
+
+    [helpstring("method TCS_UnregisterKey")] 
+    HRESULT TCS_UnregisterKey([in] TSS_UUID KeyUUID);
+
+
+    [helpstring("method TCS_EnumRegisteredKeys")] 
+    HRESULT TCS_EnumRegisteredKeys(	[in, ptr] TSS_UUID* pKeyUUID,
+                            [out] UINT32* pcKeyHierarchySize,
+                            [out, size_is(, *pcKeyHierarchySize)] TSS_KM_KEYINFO** ppKeyHierarchy);
+
+    [helpstring("method TCS_GetRegisteredKey")] 
+    HRESULT TCS_GetRegisteredKey([in] TSS_UUID KeyUUID,
+                                 [out] TSS_KM_KEYINFO** ppKeyInfo);
+
+    [helpstring("method TCS_GetRegisteredKeyBlob")] 
+    HRESULT TCS_GetRegisteredKeyBlob([in] TSS_UUID KeyUUID,
+                                     [out] UINT32* pcKeySize,
+                                     [out, size_is(, *pcKeySize)] BYTE** prgbKey);
+
+// HRESULT TCSP_GetRegisteredKeyByPublicInfo
+};
+
+[
+    object,
+    uuid(FBCD9C05-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSCryptography Interface"),
+    pointer_default(unique)
+]
+interface ITCSCryptography : IUnknown
+{	
+    [helpstring("method TCSP_Sign")] 
+    HRESULT TCSP_Sign(	[in] TCS_KEY_HANDLE keyHandle,
+                        [in] UINT32 areaToSignSize,	
+                        [in, size_is(areaToSignSize)] BYTE* areaToSign,
+                        [in, out, ptr] TCS_AUTH* privAuth,
+                        [out] UINT32* sigSize,
+                        [out, size_is(, *sigSize)] BYTE** sig);
+
+    [helpstring("method TCSP_Unbind")] 
+    HRESULT TCSP_Unbind([in] TCS_KEY_HANDLE keyHandle,
+                        [in] UINT32 inDataSize,
+                        [in, size_is(inDataSize)] BYTE* inData,
+                        [in, out, ptr] TCS_AUTH* privAuth,
+                        [out] UINT32* outDataSize,
+                        [out, size_is(, *outDataSize)] BYTE** outData);
+                            
+    [helpstring("method TCSP_Seal")] 
+    HRESULT TCSP_Seal(	[in] TCS_KEY_HANDLE keyHandle,
+                        [in] TCG_ENCAUTH encAuth,
+                        [in] UINT32 pcrInfoSize,
+                        [in, ptr, size_is(pcrInfoSize)] BYTE* PcrInfo,
+                        [in] UINT32 inDataSize,
+                        [in, size_is(inDataSize)] BYTE* inData,
+                        [in, out, ptr] TCS_AUTH* pAuth,
+                        [out] UINT32* SealedDataSize,
+                        [out, size_is(, *SealedDataSize)] BYTE** SealedData);	
+
+    [helpstring("method TCSP_Unseal")] 
+    HRESULT TCSP_Unseal([in] TCS_KEY_HANDLE parentHandle,
+                        [in] UINT32 SealedDataSize,
+                        [in, size_is(SealedDataSize)] BYTE* SealedData,
+                        [in, out, ptr] TCS_AUTH* parentAuth,
+                        [in, out, ptr] TCS_AUTH* dataAuth,
+                        [out] UINT32* DataSize,
+                        [out, size_is(, *DataSize)] BYTE** Data);
+
+};
+
+[
+    object,
+    uuid(FBCD9C06-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSAuthorization Interface"),
+    pointer_default(unique)
+]
+interface ITCSAuthorization : IUnknown
+{	
+    [helpstring("method TCSP_ChangeAuth")] 
+    HRESULT TCSP_ChangeAuth([in] TCS_KEY_HANDLE parentHandle,
+                            [in] TPM_PROTOCOL_ID protocolID,
+                            [in] TCG_ENCAUTH newAuth,
+                            [in] TCG_ENTITY_TYPE entityType,
+                            [in] UINT32 encDataSize,
+                            [in, size_is(encDataSize)] BYTE* encData,
+                            [in, out, ptr] TCS_AUTH* ownerAuth,
+                            [in, out, ptr] TCS_AUTH* entityAuth,
+                            [out] UINT32* outDataSize,
+                            [out, size_is(, *outDataSize)] BYTE** outData);
+
+    [helpstring("method TCSP_ChangeAuthOwner")] 
+    HRESULT TCSP_ChangeAuthOwner(	[in] TPM_PROTOCOL_ID protocolID,
+                                    [in] TCG_ENCAUTH newAuth,
+                                    [in] TCG_ENTITY_TYPE entityType,
+                                    [in, out, ptr] TCS_AUTH* ownerAuth);
+
+// HRESULT TCSP_ChangeAuthAsymStart
+// HRESULT TCSP_ChangeAuthAsymFinish
+    
+    [helpstring("method TCSP_OIAP")] 
+    HRESULT TCSP_OIAP(	[out] TCS_AUTHHANDLE* authHandle,
+                        [out] TCG_NONCE* nonce0);
+
+    [helpstring("method TCSP_OSAP")] 
+    HRESULT TCSP_OSAP(	[in] TCG_ENTITY_TYPE entityType,
+                        [in] UINT32 entityValue,
+                        [in] TCG_NONCE nonceOddOSAP,
+                        [out] TCS_AUTHHANDLE* authHandle,
+                        [out] TCG_NONCE* nonceEven,
+                        [out] TCG_NONCE* nonceEvenOSAP);
+
+    [helpstring("method TCSP_TerminateHandle")] 
+    HRESULT TCSP_TerminateHandle([in] TCS_AUTHHANDLE handle);
+};
+
+
+[
+    object,
+    uuid(FBCD9C07-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSIntegrity Interface"),
+    pointer_default(unique)
+]
+interface ITCSIntegrity : IUnknown
+{
+    [helpstring("method TCSP_Extend")] 
+    HRESULT TCSP_Extend(	[in] TCG_PCRINDEX pcrNum,
+                            [in] TCG_DIGEST inDigest,		
+                            [out] TCG_PCRVALUE* outDigest);
+
+    [helpstring("method TCSP_PcrRead")] 
+    HRESULT TCSP_PcrRead(	[in] TCG_PCRINDEX pcrNum,
+                            [out] TCG_PCRVALUE* outDigest);
+
+    [helpstring("method TCSP_DirWriteAuth")] 
+    HRESULT TCSP_DirWriteAuth(	[in] TCG_DIRINDEX dirIndex,
+                                [in] TCG_DIRVALUE newContents,
+                                [in, out, ptr] TCS_AUTH* ownerAuth);
+
+    [helpstring("method TCSP_DirRead")] 
+    HRESULT TCSP_DirRead(	[in] TCG_DIRINDEX dirIndex,
+                            [out] TCG_DIRVALUE* dirValue);
+
+    [helpstring("method TCSP_Quote")] 
+    HRESULT TCSP_Quote(	[in] TCS_KEY_HANDLE hKey,
+                        [in] TCG_NONCE Nonce,
+                        [in, out] UINT32* PcrDataSize,
+                        [in, out, size_is(, *PcrDataSize)] BYTE** PcrData,
+                        [in, out, ptr] TCS_AUTH* pAuth,
+                        [out] UINT32* pcSignatureSize,
+                        [out, size_is(, *pcSignatureSize)] BYTE** ppSignature);
+};
+
+[
+    object,
+    uuid(FBCD9C08-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSTpm Interface"),
+    pointer_default(unique)
+]
+interface ITCSTpm : IUnknown
+{
+    [helpstring("method TCSP_CreateEndorsementKeyPair")] 
+    HRESULT TCSP_CreateEndorsementKeyPair([in] TCG_NONCE antiReplay,
+                    [in, out] UINT32* pPubEndorsementKeySize,
+                    [in, out, size_is(, *pPubEndorsementKeySize)] BYTE** ppPubEndorsementKey,
+                    [out] TCG_DIGEST* pChecksum);
+
+    [helpstring("method TCSP_DisableForceClear")] 
+    HRESULT TCSP_DisableForceClear();
+
+    [helpstring("method TCSP_DisablePubekRead")] 
+    HRESULT TCSP_DisablePubekRead([in, out, ptr] TCS_AUTH* ownerAuth);
+
+    [helpstring("method TCSP_DisableOwnerClear")] 
+    HRESULT TCSP_DisableOwnerClear([in, out, ptr] TCS_AUTH* ownerAuth);
+
+    [helpstring("method TCSP_ForceClear")] 
+    HRESULT TCSP_ForceClear();
+
+    [helpstring("method TCSP_GetCapability")] 
+    HRESULT TCSP_GetCapability([in] TPM_CAPABILITY_AREA capArea,
+                       [in] UINT32 subCapSize,
+                       [in, ptr, size_is(subCapSize)] BYTE* subCap,
+                       [out] UINT32* respSize,
+                       [out, size_is(, *respSize)] BYTE** resp);
+
+    [helpstring("method TCSP_GetCapabilityOwner")] 
+    HRESULT TCSP_GetCapabilityOwner([in, out, ptr] TCS_AUTH* pOwnerAuth,
+                          [out] TPM_VERSION* pVersion,
+                          [out] UINT32* pNonVolatileFlags,
+                          [out] UINT32* pVolatileFlags);
+
+// HRESULT TCSP_GetCapabilitySigned
+
+    [helpstring("method TCSP_GetTestResult")] 
+    HRESULT TCSP_GetTestResult([out] UINT32* outDataSize,
+                       [out, size_is(, *outDataSize)] BYTE** outData);
+
+    [helpstring("method TCSP_OwnerClear")] 
+    HRESULT TCSP_OwnerClear([in, out, ptr] TCS_AUTH* ownerAuth);
+
+    [helpstring("method TCSP_OwnerReadPubek")] 
+    HRESULT TCSP_OwnerReadPubek([in, out, ptr] TCS_AUTH* ownerAuth,
+                        [out] UINT32* pubEndorsementKeySize,
+                        [out, size_is(, *pubEndorsementKeySize)] BYTE** pubEndorsementKey);
+
+    [helpstring("method TCSP_OwnerSetDisable")] 
+    HRESULT TCSP_OwnerSetDisable([in] TSS_BOOL disableState,
+                         [in, out, ptr] TCS_AUTH* ownerAuth);
+
+    [helpstring("method TCSP_PhysicalDisable")] 
+    HRESULT TCSP_PhysicalDisable();
+
+    [helpstring("method TCSP_PhysicalEnable")] 
+    HRESULT TCSP_PhysicalEnable();
+
+    [helpstring("method TCSP_PhysicalPresence")] 
+    HRESULT TCSP_PhysicalPresence([in] TPM_PHYSICAL_PRESENCE fPhysicalPresence);
+
+    [helpstring("method TCSP_PhysicalSetDeactivated")] 
+    HRESULT TCSP_PhysicalSetDeactivated([in] TSS_BOOL state);
+
+    [helpstring("method TCSP_ReadPubek")] 
+    HRESULT TCSP_ReadPubek([in] TCG_NONCE antiReplay,
+                     [out] UINT32* pubEndorsementKeySize,
+                     [out, size_is(, *pubEndorsementKeySize)] BYTE** pubEndorsementKey,
+                     [out] TCG_DIGEST* checksum);
+
+    [helpstring("method TCSP_SelfTestFull")] 
+    HRESULT TCSP_SelfTestFull();
+
+// HRESULT TCSP_CertifySelfTest
+// HRESULT TCSP_ContinueSelfTest
+
+    [helpstring("method TCSP_SetOwnerInstall")] 
+    HRESULT TCSP_SetOwnerInstall([in] TSS_BOOL state);
+
+    [helpstring("method TCSP_SetTempDeactivated")] 
+    HRESULT TCSP_SetTempDeactivated();
+
+    [helpstring("method TCSP_TakeOwnership")] 
+    HRESULT TCSP_TakeOwnership([in] UINT32 protocolID, 
+                       [in] UINT32 encOwnerAuthSize,
+                       [in, size_is(encOwnerAuthSize)] BYTE* encOwnerAuth,
+                       [in] UINT32 encSrkAuthSize,
+                       [in, ptr, size_is(encSrkAuthSize)] BYTE* encSrkAuth,
+                       [in, out] UINT32* pSrkSize,
+                       [in, out, size_is(, *pSrkSize)] BYTE** ppSrk,
+                       [in, out, ptr] TCS_AUTH* pOwnerAuth);
+
+    [helpstring("method TCSP_FieldUpgrade")]
+    HRESULT TCSP_FieldUpgrade([in] UINT32 dataInSize,
+                      [in, ptr, size_is(dataInSize)] BYTE* dataIn,
+                      [in, out, ptr] TCS_AUTH* ownerAuth,
+                      [out] UINT32* dataOutSize,
+                      [out, size_is(, *dataOutSize)] BYTE** dataOut);
+
+// HRESULT TCSP_SetRedirection
+
+};
+
+[
+    object,
+    uuid(FBCD9C12-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSTpm2 Interface"),
+    pointer_default(unique)
+]
+interface ITCSTpm2 : ITCSTpm
+{
+    [helpstring("method TCSP_OwnerReadInternalPub")]
+    HRESULT TCSP_OwnerReadInternalPub([in] TCS_KEY_HANDLE hKey,
+                                      [in, out, ptr] TCS_AUTH* pAuth,
+                                      [out] UINT32* pcPubKeySize,
+                                      [out, size_is(, *pcPubKeySize)] BYTE** ppPubKey);	
+
+    [helpstring("method TCSP_KeyControlOwner")]
+    HRESULT TCSP_KeyControlOwner([in] TCS_KEY_HANDLE hKey,
+                                 [in] UINT32 cPubKeyDataSize,
+                                 [in, size_is(cPubKeyDataSize)] BYTE* pPubKeyData,
+                                 [in] TPM_KEY_CONTROL KeyAttribBit,
+                                 [in] TSS_BOOL BitValue,
+                                 [in, out, ptr] TCS_AUTH* pAuth);
+        
+    [helpstring("method TCSP_SetCapability")] 
+    HRESULT TCSP_SetCapability([in] TPM_CAPABILITY_AREA CapArea,
+                               [in] UINT32 cSubCapSize,
+                               [in, size_is(cSubCapSize)] BYTE* pSubCap,
+                               [in] UINT32 cSetValueSize,
+                               [in, size_is(cSetValueSize)] BYTE* pSetValue,
+                               [in, out, ptr] TCS_AUTH* pAuth);
+
+    [helpstring("method TCSP_CreateRevocableEndorsementKeyPair")]
+    HRESULT TCSP_CreateRevocableEndorsementKeyPair([in] TCG_NONCE AntiReplay,
+                            [in] UINT32 cEndorsementKeyInfoSize,
+                            [in, size_is(cEndorsementKeyInfoSize)] BYTE* pEndorsementKeyInfo,
+                            [in] TSS_BOOL GenRestAuth,
+                            [in, out, ptr] TCG_DIGEST* EKResetAuth,
+                            [out] UINT32*	cEndorsementKeySize,
+                            [out, size_is(, *cEndorsementKeySize )]BYTE** ppEndorsementKey,
+                            [out] TCG_DIGEST* pChecksum);
+
+    [helpstring("method TCSP_RevokeEndorsementKeyPair")]
+    HRESULT TCSP_RevokeEndorsementKeyPair([in] TCG_DIGEST EKResetAuth);
+
+    [helpstring("method TCSP_SetOwnerPointer")]
+    HRESULT TCSP_SetOwnerPointer([in] TCG_ENTITY_TYPE EntityType,
+                                 [in] UINT32 EntityValue);
+
+};	// end of interface ITCSTpmInterim1
+
+[
+    object,
+    uuid(FBCD9C09-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSIdentityKey Interface"),
+    pointer_default(unique)
+]
+interface ITCSIdentityKey : IUnknown
+{
+    [helpstring("method TCSP_MakeIdentity")] 
+    HRESULT TCSP_MakeIdentity([in] TCG_ENCAUTH IdentityAuth,
+                      [in] TPM_CHOSENID_HASH	IDLabel_PrivCAHash,
+                      [in, out] UINT32* pcIdentityKeySize,
+                      [in, out, size_is(, *pcIdentityKeySize)] BYTE** prgbIdentityKey,
+                      [in, out, ptr] TCS_AUTH* pSrkAuth,
+                      [in, out, ptr] TCS_AUTH* pOwnerAuth,
+                      [out] UINT32* pcIdentityBindingSize,
+                      [out, size_is(, *pcIdentityBindingSize)] BYTE** prgbIdentityBinding,
+                      [out] UINT32* pcEndorsementCredentialSize,
+                      [out, size_is(, *pcEndorsementCredentialSize)] BYTE** prgbEndorsementCredential,
+                      [out] UINT32* pcPlatformCredentialSize,
+                      [out, size_is(, *pcPlatformCredentialSize)] BYTE** prgbPlatformCredential,
+                      [out] UINT32* pcConformanceCredentialSize,
+                      [out, size_is(, *pcConformanceCredentialSize)] BYTE** prgbConformanceCredential);
+
+    [helpstring("method TCSP_ActivateTPMIdentity")] 
+    HRESULT TCSP_ActivateTPMIdentity([in] TCS_KEY_HANDLE hIdKey,
+                                     [in] UINT32 unBlobSize,
+                                     [in, size_is(unBlobSize)] BYTE* pbBlob,
+                                     [in, out, ptr] TCS_AUTH* pIdKeyAuth,
+                                     [in, out, ptr] TCS_AUTH* pOwnerAuth,
+                                     [out] UINT32* punSymmetricKeySize,
+                                     [out, size_is(, *punSymmetricKeySize)] BYTE** ppSymmetricKey);
+};
+
+
+[
+    object,
+    uuid(FBCD9C0A-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSMigration Interface"),
+    pointer_default(unique)
+]
+interface ITCSMigration : IUnknown
+{
+    [helpstring("method TCSP_AuthorizeMigrationKey")] 
+    HRESULT TCSP_AuthorizeMigrationKey([in] TPM_MIGRATE_SCHEME migrateScheme,
+                             [in] UINT32 MigrationKeySize,
+                             [in, size_is(MigrationKeySize)] BYTE* MigrationKey,
+                             [in, out, ptr] TCS_AUTH* ownerAuth,
+                             [out] UINT32* MigrationKeyAuthSize,
+                             [out, size_is(, *MigrationKeyAuthSize)] BYTE** MigrationKeyAuth);
+
+    [helpstring("method TCSP_ConvertMigrationBlob")]
+    HRESULT TCSP_ConvertMigrationBlob([in] TCS_KEY_HANDLE parentHandle,
+                            [in] UINT32 inDataSize,
+                            [in, size_is(inDataSize)] BYTE* inData,
+                            [in] UINT32 randomSize,
+                            [in, size_is(randomSize)] BYTE* rgbRandom,
+                            [in, out, ptr] TCS_AUTH* parentAuth,
+                            [out] UINT32* outDataSize,
+                            [out, size_is(, *outDataSize)] BYTE**	outData);
+
+    [helpstring("method TCSP_CreateMigrationBlob")]
+    HRESULT TCSP_CreateMigrationBlob([in] TCS_KEY_HANDLE parentHandle,
+                           [in] TPM_MIGRATE_SCHEME migrationType,
+                           [in] UINT32 migrationKeyAuthSize,
+                           [in, size_is(migrationKeyAuthSize)] BYTE* MigrationKeyAuth,
+                           [in] UINT32 encDataSize,
+                           [in, size_is(encDataSize)]	BYTE* encData,
+                           [in, out, ptr] TCS_AUTH* parentAuth,
+                           [in, out, ptr] TCS_AUTH* entityAuth,
+                           [out] UINT32* randomSize,
+                           [out, size_is(, *randomSize)] BYTE** random,
+                           [out] UINT32* outDataSize,
+                           [out, size_is(, *outDataSize)] BYTE**	outData);
+};
+
+[
+    object,
+    uuid(FBCD9C13-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSTpmManagement Interface"),
+    pointer_default(unique)
+]
+interface ITCSTpmManagement : IUnknown
+{
+    [helpstring("method TCSP_SetOperatorAuth")] 
+    HRESULT TCSP_SetOperatorAuth([in] TPM_SECRET OperatorAuth);
+
+    [helpstring("method TCSP_SetTempDeactivated2")] 
+    HRESULT TCSP_SetTempDeactivated2([in, out, ptr] TCS_AUTH* pOperatorAuth);
+    
+    [helpstring("method TCSP_ResetEstablishmentBit")] 
+    HRESULT TCSP_ResetEstablishmentBit();
+
+    [helpstring("method TCSP_FlushSpecific")] 
+    HRESULT TCSP_FlushSpecific([in] TCS_HANDLE hResHandle,
+                               [in] TPM_RESOURCE_TYPE ResourceType);
+
+    [helpstring("method TCSP_ResetLockValue")] 
+    HRESULT TCSP_ResetLockValue([in, out, ptr] TCS_AUTH* pOwnerAuth);
+
+};	// end of interface ITCSTpmManagement
+
+[
+    object,
+    uuid(FBCD9C0B-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSEventManager Interface"),
+    pointer_default(unique)
+]
+interface ITCSEventManager : IUnknown
+{
+
+// HRESULT TCS_LogPcrEvent 
+// HRESULT TCS_GetPcrEvent
+// HRESULT TCS_GetPcrEventsByPcr
+// HRESULT TCS_GetPcrEventLog
+
+};
+
+
+[
+    object,
+    uuid(FBCD9C0C-72CB-47BB-99DD-2317551491DE),
+    helpstring("ITCSMaintenance Interface"),
+    pointer_default(unique)
+]
+interface ITCSMaintenance : IUnknown
+{
+// HRESULT TCSP_CreateMaintenanceArchive
+// HRESULT TCSP_LoadMaintenanceArchive
+// HRESULT TCSP_KillMaintenanceFeature
+// HRESULT TCSP_LoadManuMaintPub
+// HRESULT TCSP_ReadManuMaintPub
+};
+
+
+// TSSCORELib
+[
+    uuid(FBCD9C00-72CB-47BB-99DD-2317551491DE),
+    version(1.0),
+    helpstring("TSSCore 1.0 Type Library")
+]
+library TSSCORELib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+    [
+        uuid(FBCD9C01-72CB-47BB-99DD-2317551491DE),
+        helpstring("TSSCoreService Class")
+    ]
+    coclass TSSCoreService
+    {
+        [default] interface ITCSBase;
+        interface ITCSTransportProtection;
+        interface ITCSNonVolatileStorage;
+        interface ITCSCertifiedMigration;
+        interface ITCSKey1;
+        interface ITCSKey2;
+        interface ITCSKey;
+        interface ITCSKeyManage;
+        interface ITCSCryptography;
+        interface ITCSAuthorization;
+        interface ITCSIntegrity;
+        interface ITCSTpm2;
+        interface ITCSTpm;
+        interface ITCSIdentityKey;
+        interface ITCSTpmManagement;
+        interface ITCSMigration;
+        interface ITCSEventManager;
+        interface ITCSMaintenance;
+    };
+};

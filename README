@@ -1,0 +1,49 @@
+======
+TRUNKS
+======
+
+The Trunks TPM Library (TTL) is a set of types and functions used to interface
+with a Trusted Platform Module.  It is designed to be small, and does not
+comply with the TSS specification.  It is usable in firmware as well as in
+user-level code.
+
+-----------------
+CODE ORGANIZATION
+-----------------
+
+A python script (ttl_generator.py) takes TPM command and data structure
+specification from two source files, and outputs code to convert (marshal and
+unmarshal) TPM commands between TPM format and C data structures.  The input
+files are:
+
+tss_tpm_h --- This header file is provided by the Trusted Computing Group (TCG)
+as part of the TSS specification
+(http://www.trustedcomputinggroup.org/resources/tcg_software_stack_tss_specification).
+It is in MIDL (Microsoft Interface Definition Language) format, which is
+compatible with C by adding a few macros.
+
+tpm_commands_specification.txt --- This text file is extracted from the TPM
+main specification part 3 (in PDF format), also provided by the TCG
+(http://www.trustedcomputinggroup.org/files/static_page_files/72C33D71-1A4B-B294-D02C7DF86630BE7C/TPM%20Main-Part%203%20Commands_v1.2_rev116_01032011.pdf).
+It has been manually modified in a small number of places.  It is first
+processed by tpm_commands_extractor.sh, which produces
+g_tpm_commands_structure.txt, which is then read by ttl_generator.py.
+
+-------
+TESTING
+-------
+
+A minimal test is provided.  A normal build produces the binary ttl-test, which
+tests the marshalling of a simple command.
+
+We do not test the conversion steps from the PDF commands description and the
+MIDL header file into marshalling code.  We provide the code for the
+conversions steps only to facilitate the upgrade to a new TPM standard, should
+one come up.  The conversion steps are very ad-hoc and cannot offer any
+guarantee that the marshalling code is correct.  Verifying its correctness
+requires interfacing with a hardware or software TPM which is known to conform
+to the standard.  Inevitably, the testing of this software stack and of the TPM
+itself (either hardware or software) are bound together.
+
+It would be good if the TCG provided a formal description of the commands in a
+language appropriate for parsing.

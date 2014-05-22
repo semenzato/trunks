@@ -1,0 +1,33 @@
+/* Copyright (c) 2011 The Chromium OS Authors. All rights reserved.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "command.h"
+
+/* Sends a TPM_VerySimple command to the TPM and reads the response. */
+uint32_t Ttl_TPM_VerySimple(void) {
+  uint8_t buffer[TPM_MAX_COMMAND_LENGTH];
+  uint32_t buffer_size = sizeof(buffer);
+  uint32_t return_code;
+  uint8_t* cursor = buffer;
+  uint32_t read_bytes;
+  TPM_TAG tag = TPM_TAG_RQU_COMMAND;
+  uint32_t ordinal = TPM_ORD_VerySimple;
+  uint32_t message_size = TPM_RQU_HEADER_SIZE;
+  if (message_size > buffer_size) return TPM_BAD_PARAM_SIZE;
+  TtlMarshal_uint16_t(&tag, &cursor);
+  TtlMarshal_uint32_t(&message_size, &cursor);
+  TtlMarshal_uint32_t(&ordinal, &cursor);
+  RETURN_ON_FAILURE(TtlExecute(buffer, message_size, buffer_size, &read_bytes));
+  cursor = buffer;
+  TtlUnmarshal_uint16_t(&tag, &cursor);
+  TtlUnmarshal_uint32_t(&message_size, &cursor);
+  TtlUnmarshal_uint32_t(&return_code, &cursor);
+  if (return_code != TPM_SUCCESS) return return_code;
+  if (message_size != read_bytes) return TPM_E_COMMUNICATION_ERROR;
+  if (message_size > buffer_size) return TPM_BAD_PARAM_SIZE;
+  if (message_size != TPM_RSP_HEADER_SIZE) return TPM_BAD_PARAM_SIZE;
+  return TPM_SUCCESS;
+}
+

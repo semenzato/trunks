@@ -1,0 +1,15 @@
+/* Copyright (c) 2011 The Chromium OS Authors. All rights reserved.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#ifndef TRUNKS_COMMAND_H_
+#define TRUNKS_COMMAND_H_
+
+#include "g_tpm_structures.h"
+#include "trunks_internal.h"
+
+/* Sends a TPM_VerySimple command to the TPM and reads the response. */
+uint32_t Ttl_TPM_VerySimple(void);
+
+#endif  /* TRUNKS_COMMAND_H_ */

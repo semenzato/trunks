@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  Copyright (c) 2013 The Chromium OS Authors. All rights reserved.
+  Use of this source code is governed by a BSD-style license that can be
+  found in the LICENSE file.
+-->
+
+<!--
+  This file defines the Trunks D-Bus interface. It can be used to generate
+  glib bindings as follows:
+
+     dbus-binding-tool -mode=glib-server -prefix=trunks
+                        trunks_dbus_interface.xml &gt; bindings_server.h
+-->
+
+<!-- The DTD to help xmllint.
+-->
+<!DOCTYPE node PUBLIC
+  "-//freedesktop//DTD D-Bus Object Introspection 1.0//EN"
+  "http://standards.freedesktop.org/dbus/1.0/introspect.dtd">
+
+<node name="/org/chromium/Trunks">
+  <interface name="org.chromium.Trunks">
+    <method name="Ping">
+    </method>
+  </interface>
+</node>
+

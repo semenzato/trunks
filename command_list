@@ -1,0 +1,31 @@
+# Copyright (c) 2011 The Chromium OS Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+#
+# Comments may only start at the beginning of a line.
+# Empty lines are not supported.
+#
+TPM_Startup
+TPM_SaveState
+TPM_Resume
+TPM_SelfTestFull
+TPM_ContinueSelfTest
+TPM_NV_DefineSpace
+TPM_NV_WriteValue
+TPM_NV_ReadValue
+TSC_PhysicalPresence
+TPM_ReadPubek
+TPM_ForceClear
+TPM_PhysicalEnable
+TPM_PhysicalDisable
+TPM_PhysicalSetDeactivated
+TPM_GetCapability
+TPM_Extend
+TPM_OIAP
+TPM_OSAP
+TPM_FlushSpecific
+TPM_ReadPubek
+TPM_TakeOwnership
+TPM_OwnerClear
+TPM_ChangeAuthOwner
+TPM_GetTestResult

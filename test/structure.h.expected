@@ -1,0 +1,37 @@
+/* Copyright (c) 2011 The Chromium OS Authors. All rights reserved.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#ifndef TRUNKS_STRUCTURE_H_
+#define TRUNKS_STRUCTURE_H_
+
+#include <stdint.h>
+#include <string.h>
+
+#include "trunks_tpm.h"
+
+typedef uint32_t foo;
+typedef uint16_t TPM_TAG;
+typedef uint16_t TPM_COMMAND_CODE;
+
+typedef struct BAR {
+  foo x;
+  foo y;
+  foo z;
+} BAR;
+
+void TtlMarshal_BAR(BAR* record, uint8_t** cursorp);
+void TtlUnmarshal_BAR(BAR* record, uint8_t** cursorp);
+uint32_t TtlSizeCalc_BAR(BAR* record);
+
+typedef struct FOOBAR {
+  foo n;
+  uint8_t* key;
+} FOOBAR;
+
+void TtlMarshal_FOOBAR(FOOBAR* record, uint8_t** cursorp);
+void TtlUnmarshal_FOOBAR(FOOBAR* record, uint8_t** cursorp);
+uint32_t TtlSizeCalc_FOOBAR(FOOBAR* record);
+
+#endif  /* TRUNKS_STRUCTURE_H_ */

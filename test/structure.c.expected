@@ -1,0 +1,41 @@
+/* Copyright (c) 2011 The Chromium OS Authors. All rights reserved.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <stdint.h>
+#include <string.h>
+
+#include "structure.h"
+#include "trunks_internal.h"
+
+void TtlMarshal_BAR(BAR* record, uint8_t** cursorp) {
+  TtlMarshal_uint32_t(&record->x, cursorp);
+  TtlMarshal_uint32_t(&record->y, cursorp);
+  TtlMarshal_uint32_t(&record->z, cursorp);
+}
+
+void TtlUnmarshal_BAR(BAR* record, uint8_t** cursorp) {
+  TtlUnmarshal_uint32_t(&record->x, cursorp);
+  TtlUnmarshal_uint32_t(&record->y, cursorp);
+  TtlUnmarshal_uint32_t(&record->z, cursorp);
+}
+
+uint32_t TtlSizeCalc_BAR(BAR* record) {
+  return (4 + 4 + 4);
+}
+
+void TtlMarshal_FOOBAR(FOOBAR* record, uint8_t** cursorp) {
+  TtlMarshal_uint32_t(&record->n, cursorp);
+  TtlMarshal_Blob(record->key, cursorp, record->n);
+}
+
+void TtlUnmarshal_FOOBAR(FOOBAR* record, uint8_t** cursorp) {
+  TtlUnmarshal_uint32_t(&record->n, cursorp);
+  TtlUnmarshal_Blob(&record->key, cursorp, record->n);
+}
+
+uint32_t TtlSizeCalc_FOOBAR(FOOBAR* record) {
+  return (4 + record->n);
+}
+
